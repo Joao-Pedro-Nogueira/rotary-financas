@@ -28,3 +28,9 @@ use the editor.
   own key and store it in Secrets.
 - **Secrets.** Lovable manages them. Do not put secret values in the repo.
 <!-- LOVABLE:END -->
+
+## Application architecture
+- Keep financial amounts as positive integer cents and derive signed balances from transaction type; this prevents rounding drift across views.
+- Share demo state through a root React provider, hydrating browser storage after mount; this preserves navigation state without SSR hydration mismatches.
+- Keep financial calculations and seed data in a browser-safe domain module; every screen and report must use the same source of truth.
+- Use a dedicated print stylesheet for the report and browser printing for PDF export; printed totals must match the selected on-screen period.

@@ -1,0 +1,3 @@
+import { type LucideIcon } from 'lucide-react';
+import { money } from '@/lib/finance';
+export function StatCard({title,value,icon:Icon,note,tone='neutral',noteIcon:NoteIcon}:{title:string;value:number;icon:LucideIcon;note:string;tone?:'balance'|'income'|'expense'|'positive'|'neutral';noteIcon?:LucideIcon}) {return <article className={`stat-card ${tone==='balance'?'balance':''}`}><div className="stat-top"><span>{title}</span><span className={`stat-icon ${tone==='income'?'income-bg':tone==='expense'?'expense-bg':tone==='positive'?'positive-bg':''}`}><Icon/></span></div><div className={`stat-value ${tone==='income'?'income':tone==='expense'?'expense':''}`}>{money(value)}</div><div className="stat-bottom">{NoteIcon&&<NoteIcon/>}{note}</div></article>;}

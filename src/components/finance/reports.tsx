@@ -1,0 +1,14 @@
+import { useState } from 'react';
+import { Download, Wallet, ArrowDownLeft, ArrowUpRight, Landmark } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { useFinance } from './provider';
+import { StatCard } from './stat-card';
+import { PeriodSelect,CustomDates } from './period';
+import { FlowChart,CategoryReport } from './charts';
+import { TransactionTable } from './transaction-table';
+import { summarize,periodRange,money,dateLabel,CLUB,REFERENCE_DATE,type Period } from '@/lib/finance';
+export function Reports(){
+ const {transactions,initial}=useFinance();const [period,setPeriod]=useState<Period>('month'),[from,setFrom]=useState('2026-11-01'),[to,setTo]=useState(REFERENCE_DATE);
+ const range=periodRange(period,from,to),s=summarize(transactions,initial,range.from,range.to);
+ return <><div className="print-header"><h1>Rotary Finanças</h1><p>{CLUB}</p><h2>Relatório Financeiro</h2><p>Período: {dateLabel(range.from)} a {dateLabel(range.to)}</p><p>Dados fictícios — demonstração acadêmica</p></div><div className="page-heading"><div><h1>Relatórios financeiros</h1><p>Analise receitas, despesas e resultados financeiros do clube.</p></div><div className="page-controls"><PeriodSelect value={period} onChange={setPeriod}/><Button onClick={()=>window.print()} disabled={!range.from||!range.to||range.from>range.to}><Download/>Exportar relatório</Button></div></div>{period==='custom'&&<CustomDates from={from} to={to} onFrom={setFrom} onTo={setTo}/>}<div className="stat-grid"><StatCard title="Saldo inicial" value={s.opening} icon={Landmark} note="Saldo anterior ao período"/><StatCard title="Total de receitas" value={s.income} icon={ArrowDownLeft} note="Entradas do período" tone="income"/><StatCard title="Total de despesas" value={s.expenses} icon={ArrowUpRight} note="Saídas do período" tone="expense"/><StatCard title="Saldo final" value={s.closing} icon={Wallet} note="Saldo inicial + entradas − saídas" tone="balance"/></div><div className="chart-grid"><FlowChart transactions={s.filtered} from={range.from} to={range.to} report/><CategoryReport transactions={s.filtered}/></div><section className="panel"><div className="table-heading"><div><h2>Demonstrativo financeiro</h2><p>{dateLabel(range.from)} a {dateLabel(range.to)}</p></div><span className="text-xs text-muted-foreground no-print">{s.filtered.length} movimentações</span></div><TransactionTable transactions={[...s.filtered].sort((a,b)=>a.date.localeCompare(b.date))} statement/><div className="report-totals"><div><small>Total de receitas</small><strong className="income">{money(s.income)}</strong></div><div><small>Total de despesas</small><strong className="expense">{money(s.expenses)}</strong></div><div><small>Resultado do período</small><strong className={s.result<0?'expense':'income'}>{money(s.result)}</strong></div><div><small>Saldo final</small><strong>{money(s.closing)}</strong></div></div></section></>;
+}
